@@ -1,3 +1,9 @@
 <resources>
-    <string name="app_name">Messenger</string>
+    <string name="app_name">Amas_Messenger (Beta)</string>
+    <string name="sign_in">Sign in</string>
+    <string name="register">Register</string>
+    <string name="email">Email</string>
+    <string name="password">Password</string>
+    <string name="username">Username</string>
+    <string name="ask_account_existence">Already have an account?</string>
 </resources>
