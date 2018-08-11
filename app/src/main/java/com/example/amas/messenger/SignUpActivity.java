@@ -36,10 +36,12 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
 
     private FirebaseAuth mAuth;
 
+    private EditText mUsername;
     private EditText mEmail;
     private EditText mPassword;
 
     private Button photo_selector_button;
+    private Button registerButton;
 
     ProgressDialog dialog;
 
@@ -54,9 +56,12 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
 
         mAuth = FirebaseAuth.getInstance();
 
+        mUsername = findViewById(R.id.username);
         mEmail = findViewById(R.id.email);
         mPassword = findViewById(R.id.password);
+
         photo_selector_button = findViewById(R.id.photo_selector);
+        registerButton = findViewById(R.id.register_button);
 
         findViewById(R.id.register_button).setOnClickListener(this);
         findViewById(R.id.back_to_sign_in).setOnClickListener(this);
@@ -64,8 +69,24 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
 
         dialog = new ProgressDialog(SignUpActivity.this);
 
+        showAnimation();
     }
 
+    private void showAnimation(){
+        photo_selector_button.setAlpha(0f);
+        registerButton.setAlpha(0f);
+
+        mUsername.setRotationX(-90f);
+        mEmail.setRotationX(-90f);
+        mPassword.setRotationX(-90f);
+
+        photo_selector_button.animate().alphaBy(1f).setDuration(1000);
+        registerButton.animate().alphaBy(1f).setDuration(1000);
+        
+        mUsername.animate().rotationXBy(90f).setDuration(1000);
+        mEmail.animate().rotationXBy(90f).setDuration(1000);
+        mPassword.animate().rotationXBy(90f).setDuration(1000);
+    }
     public void createAccount(String email, String password){
         Log.d(TAG, "createAccount:" + email);
         if (!validateForm()) {
