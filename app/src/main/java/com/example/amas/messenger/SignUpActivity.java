@@ -4,6 +4,7 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
+import android.net.Uri;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -16,11 +17,18 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.RuntimeExecutionException;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.StorageTask;
+import com.google.firebase.storage.UploadTask;
 
 import java.io.IOException;
+import java.util.UUID;
 
 public class SignUpActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -34,6 +42,8 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
     private Button photo_selector_button;
 
     ProgressDialog dialog;
+
+    Uri profilePhotoUri = null; //uri used for profile photo
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,7 +82,7 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
                             // Sign up success, update UI with the signed-in user's information
-                            
+                            uploadProfilePhotoToFireBaseStorage();
                             Log.d(TAG, "createUserWithEmail:success");
                             Toast.makeText(SignUpActivity.this, "Account Created Successfully", Toast.LENGTH_SHORT).show();
 //                            updateUI(user);
@@ -81,6 +91,11 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
                             Log.w(TAG, "createUserWithEmail:failure", task.getException());
                             Toast.makeText(SignUpActivity.this, "Authentication failed.",
                                     Toast.LENGTH_SHORT).show();
+                                try{
+                                Toast.makeText(SignUpActivity.this,task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                                }
+                                catch (NullPointerException ex){
+                                }
 //                            updateUI(null);
                         }
 
@@ -90,6 +105,22 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
                     }
                 });
         // [END create_user_with_email]
+    }
+
+    private void uploadProfilePhotoToFireBaseStorage(){
+        if(profilePhotoUri == null) {
+            Toast.makeText(this, "Select an image", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        String fileName = UUID.randomUUID().toString(); // make a random string for the name of the file
+        StorageReference sFirebase = FirebaseStorage.getInstance().getReference("/image/" + fileName);
+        sFirebase.putFile(profilePhotoUri).addOnSuccessListener(this, new OnSuccessListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+            Toast.makeText(SignUpActivity.this,"Image Uploaded",Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private void showProgressDialog() {
@@ -153,7 +184,8 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
             Log.d("SignUp","Photo was selected");
 
             try {
-                Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(),data.getData());
+                profilePhotoUri = data.getData();
+                Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(),profilePhotoUri);
                 BitmapDrawable bitmapDrawable = new BitmapDrawable(bitmap);
                 photo_selector_button.setBackgroundDrawable(bitmapDrawable);
             } catch (IOException e) {
