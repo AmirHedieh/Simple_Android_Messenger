@@ -27,6 +27,7 @@ public class SignInActivity extends AppCompatActivity implements View.OnClickLis
     private void showAnimation(){
         email.setRotationX(-90f);
         password.setRotationX(-90f);
+        
         email.animate().rotationXBy(90f).setDuration(1000);
         password.animate().rotationXBy(90f).setDuration(950);
     }
