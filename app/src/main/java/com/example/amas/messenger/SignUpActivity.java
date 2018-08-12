@@ -14,6 +14,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -26,9 +27,14 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.StorageTask;
 import com.google.firebase.storage.UploadTask;
+import com.theartofdev.edmodo.cropper.CropImage;
+import com.theartofdev.edmodo.cropper.CropImageActivity;
+import com.theartofdev.edmodo.cropper.CropImageView;
 
 import java.io.IOException;
 import java.util.UUID;
+
+import de.hdodenhof.circleimageview.CircleImageView;
 
 public class SignUpActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -39,6 +45,8 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
     private EditText mUsername;
     private EditText mEmail;
     private EditText mPassword;
+
+    private CircleImageView profilePhotoImageView;
 
     private Button photo_selector_button;
     private Button registerButton;
@@ -53,12 +61,13 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_up);
 
-
         mAuth = FirebaseAuth.getInstance();
 
         mUsername = findViewById(R.id.username);
         mEmail = findViewById(R.id.email);
         mPassword = findViewById(R.id.password);
+
+        profilePhotoImageView = findViewById(R.id.profile_image_view);
 
         photo_selector_button = findViewById(R.id.photo_selector);
         registerButton = findViewById(R.id.register_button);
@@ -82,7 +91,7 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
 
         photo_selector_button.animate().alphaBy(1f).setDuration(1000);
         registerButton.animate().alphaBy(1f).setDuration(1000);
-        
+
         mUsername.animate().rotationXBy(90f).setDuration(1000);
         mEmail.animate().rotationXBy(90f).setDuration(1000);
         mPassword.animate().rotationXBy(90f).setDuration(1000);
@@ -191,9 +200,25 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
             SignUpActivity.this.finish();
         }
         else if(id == R.id.photo_selector){
-            Intent intent = new Intent(Intent.ACTION_PICK);
-            intent.setType("image/*");
-            startActivityForResult(intent,0);
+//            Intent intent = new Intent(Intent.ACTION_PICK);
+//            intent.setType("image/*");
+//            startActivityForResult(intent,0);
+
+            // start picker to get image for cropping and then use the image in cropping activity
+            CropImage.activity()
+                    .setGuidelines(CropImageView.Guidelines.ON)
+                    .setFixAspectRatio(true)
+                    .setAspectRatio(1,1)
+                    .setCropShape(CropImageView.CropShape.OVAL)
+                    .start(this);
+
+            // start cropping activity for pre-acquired image saved on the device
+//            CropImage.activity(profilePhotoUri)
+//                    .start(this);
+
+        // for fragment (DO NOT use `getActivity()`)
+//            CropImage.activity()
+//                    .start(this, CropImageActivity.class);
         }
     }
 
@@ -201,17 +226,37 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if(requestCode == 0 && resultCode == RESULT_OK && data != null){
-            Log.d("SignUp","Photo was selected");
+//        if(requestCode == 0 && resultCode == RESULT_OK && data != null){
+//            Log.d("SignUp","Photo was selected");
+//
+//            try {
+//                profilePhotoUri = data.getData();
+//                Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(),profilePhotoUri);
+//                BitmapDrawable bitmapDrawable = new BitmapDrawable(bitmap);
+//                photo_selector_button.setBackgroundDrawable(bitmapDrawable);
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+//        }
 
-            try {
-                profilePhotoUri = data.getData();
-                Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(),profilePhotoUri);
-                BitmapDrawable bitmapDrawable = new BitmapDrawable(bitmap);
-                photo_selector_button.setBackgroundDrawable(bitmapDrawable);
-            } catch (IOException e) {
-                e.printStackTrace();
+        if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
+            CropImage.ActivityResult result = CropImage.getActivityResult(data);
+            if (resultCode == RESULT_OK) {
+                profilePhotoUri = result.getUri();
+                try {
+                    Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), profilePhotoUri);
+                    profilePhotoImageView.setImageBitmap(bitmap);
+                    photo_selector_button.setAlpha(0f);
+//                    BitmapDrawable bitmapDrawable = new BitmapDrawable(bitmap);
+//                    photo_selector_button.setBackgroundDrawable(bitmapDrawable);
+                }catch(IOException ex
+                        ){
+
+                    }
+                } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
+                Exception error = result.getError();
             }
         }
+
     }
 }
