@@ -23,6 +23,8 @@ import com.google.android.gms.tasks.RuntimeExecutionException;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.StorageTask;
@@ -113,6 +115,7 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
                         if (task.isSuccessful()) {
                             // Sign up success, update UI with the signed-in user's information
                             uploadProfilePhotoToFireBaseStorage();
+
                             Log.d(TAG, "createUserWithEmail:success");
                             Toast.makeText(SignUpActivity.this, "Account Created Successfully", Toast.LENGTH_SHORT).show();
 //                            updateUI(user);
@@ -137,22 +140,6 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
         // [END create_user_with_email]
     }
 
-    private void uploadProfilePhotoToFireBaseStorage(){
-        if(profilePhotoUri == null) {
-            Toast.makeText(this, "Select an image", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        String fileName = UUID.randomUUID().toString(); // make a random string for the name of the file
-        StorageReference sFirebase = FirebaseStorage.getInstance().getReference("/image/" + fileName);
-        sFirebase.putFile(profilePhotoUri).addOnSuccessListener(this, new OnSuccessListener<UploadTask.TaskSnapshot>() {
-            @Override
-            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-            Toast.makeText(SignUpActivity.this,"Image Uploaded",Toast.LENGTH_SHORT).show();
-            }
-        });
-    }
-
     private void showProgressDialog() {
         dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
         dialog.setTitle("Registering user");
@@ -170,6 +157,19 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
 
     private boolean validateForm() {
         boolean valid = true;
+
+        if(profilePhotoImageView.getDrawable() == null){
+            Toast.makeText(this, "Please choose a picture", Toast.LENGTH_SHORT).show();
+            valid = false;
+        }
+
+        String username = mUsername.getText().toString();
+        if(TextUtils.isEmpty(username)){
+            mUsername.setError("Required.");
+            valid = false;
+        } else {
+            mUsername.setError(null);
+        }
 
         String email = mEmail.getText().toString();
         if (TextUtils.isEmpty(email)) {
@@ -200,45 +200,18 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
             SignUpActivity.this.finish();
         }
         else if(id == R.id.photo_selector){
-//            Intent intent = new Intent(Intent.ACTION_PICK);
-//            intent.setType("image/*");
-//            startActivityForResult(intent,0);
-
-            // start picker to get image for cropping and then use the image in cropping activity
             CropImage.activity()
                     .setGuidelines(CropImageView.Guidelines.ON)
                     .setFixAspectRatio(true)
                     .setAspectRatio(1,1)
                     .setCropShape(CropImageView.CropShape.OVAL)
                     .start(this);
-
-            // start cropping activity for pre-acquired image saved on the device
-//            CropImage.activity(profilePhotoUri)
-//                    .start(this);
-
-        // for fragment (DO NOT use `getActivity()`)
-//            CropImage.activity()
-//                    .start(this, CropImageActivity.class);
         }
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-
-//        if(requestCode == 0 && resultCode == RESULT_OK && data != null){
-//            Log.d("SignUp","Photo was selected");
-//
-//            try {
-//                profilePhotoUri = data.getData();
-//                Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(),profilePhotoUri);
-//                BitmapDrawable bitmapDrawable = new BitmapDrawable(bitmap);
-//                photo_selector_button.setBackgroundDrawable(bitmapDrawable);
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
-//        }
-
         if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
             CropImage.ActivityResult result = CropImage.getActivityResult(data);
             if (resultCode == RESULT_OK) {
@@ -246,17 +219,55 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
                 try {
                     Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), profilePhotoUri);
                     profilePhotoImageView.setImageBitmap(bitmap);
+
                     photo_selector_button.setAlpha(0f);
-//                    BitmapDrawable bitmapDrawable = new BitmapDrawable(bitmap);
-//                    photo_selector_button.setBackgroundDrawable(bitmapDrawable);
-                }catch(IOException ex
-                        ){
+
+                } catch(IOException ex){
 
                     }
                 } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
                 Exception error = result.getError();
+                Toast.makeText(this, error.getMessage(), Toast.LENGTH_SHORT).show();
             }
         }
-
     }
+
+    private void uploadProfilePhotoToFireBaseStorage(){
+        if(profilePhotoUri == null) {
+            Toast.makeText(this, "Select an image", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        String fileName = UUID.randomUUID().toString(); // make a random string for the name of the file
+
+        StorageReference sFirebase = FirebaseStorage.getInstance().getReference("/image/" + fileName);
+
+        sFirebase.putFile(profilePhotoUri).addOnSuccessListener(this, new OnSuccessListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                Toast.makeText(SignUpActivity.this,"Image Uploaded",Toast.LENGTH_SHORT).show();
+                registerUserOnFireBaseDataBase(taskSnapshot.getDownloadUrl().toString()); // cautious : NullPointer Exception may be thrown
+            }
+        });
+    }
+
+    private void registerUserOnFireBaseDataBase(String photoUrl){
+        String uid = mAuth.getUid();
+        String username = mUsername.getText().toString();
+
+        User user = new User(uid,username,photoUrl);
+
+         DatabaseReference mData = FirebaseDatabase.getInstance().getReference("/users/" + uid);
+
+         mData.setValue(user).addOnSuccessListener(this, new OnSuccessListener<Void>() {
+             @Override
+             public void onSuccess(Void aVoid) {
+                 Log.d("Registration","User was added to database");
+             }
+         });
+    }
+
+
+
+
+
 }
