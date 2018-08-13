@@ -4,7 +4,13 @@ import java.io.Serializable;
 
 public class User {
 
-    public User(String uid, String username, String profileUrl){
+    public String uid;
+    public String username;
+    public String profilePhotoUrl;
 
+    public User(String uid, String username, String profileUrl){
+        this.uid = uid;
+        this.username = username;
+        this.profilePhotoUrl = profileUrl;
     }
 }

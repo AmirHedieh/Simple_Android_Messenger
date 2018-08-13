@@ -258,13 +258,18 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
         }
         String fileName = UUID.randomUUID().toString(); // make a random string for the name of the file
 
-        StorageReference sFirebase = FirebaseStorage.getInstance().getReference("/image/" + fileName);
+        final StorageReference sFirebase = FirebaseStorage.getInstance().getReference("/image/" + fileName);
 
         sFirebase.putFile(profilePhotoUri).addOnSuccessListener(this, new OnSuccessListener<UploadTask.TaskSnapshot>() {
             @Override
             public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                 Toast.makeText(SignUpActivity.this,"Image Uploaded",Toast.LENGTH_SHORT).show();
-                registerUserOnFireBaseDataBase(taskSnapshot.getDownloadUrl().toString()); // cautious : NullPointer Exception may be thrown
+                sFirebase.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                    @Override
+                    public void onSuccess(Uri uri) {
+                         registerUserOnFireBaseDataBase(uri.toString()); // cautious : NullPointer Exception may be thrown
+                    }
+                });
             }
         });
     }
