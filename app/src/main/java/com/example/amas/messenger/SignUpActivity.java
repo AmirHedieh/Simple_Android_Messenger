@@ -34,6 +34,7 @@ import com.theartofdev.edmodo.cropper.CropImageActivity;
 import com.theartofdev.edmodo.cropper.CropImageView;
 
 import java.io.IOException;
+import java.util.Random;
 import java.util.UUID;
 
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -80,9 +81,27 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
 
         dialog = new ProgressDialog(SignUpActivity.this);
 
+        fillRandomData();
+
         showAnimation();
     }
 
+    private void fillRandomData(){
+        Random rnd = new Random();
+
+        String username = "";
+        username += rnd.nextInt(100) + rnd.nextInt(100) + rnd.nextInt(100);
+
+        String email = "";
+        email += rnd.nextInt(50);
+        email += rnd.nextInt(50) +  "@gmail.com";
+
+        String password = "123456798";
+
+        mUsername.setText(username);
+        mEmail.setText(email);
+        mPassword.setText(password);
+    }
     private void showAnimation(){
         photo_selector_button.setAlpha(0f);
         registerButton.setAlpha(0f);
