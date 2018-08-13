@@ -1,21 +1,27 @@
 package com.example.amas.messenger;
 
 import android.content.Intent;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
+/**
+ * its a firebase feature that if a user signs in, the firebase Authentication keeps that user logged in until
+ * user signs out, even restarting app doesn't signs out the user.
+ */
 public class SignInActivity extends AppCompatActivity implements View.OnClickListener {
-
-    private static final int RC_SIGN_IN = 123;
 
     private FirebaseAuth mAuth;
 
@@ -32,8 +38,12 @@ public class SignInActivity extends AppCompatActivity implements View.OnClickLis
 
         mAuth = FirebaseAuth.getInstance();
 
+        findViewById(R.id.sign_in_button).setOnClickListener(this);
+
         email = findViewById(R.id.sign_in_email);
         password = findViewById(R.id.sign_in_password);
+
+        Toast.makeText(this, "-" + mAuth.getCurrentUser().getEmail(), Toast.LENGTH_SHORT).show();
 
         showAnimation();
     }
@@ -50,7 +60,7 @@ public class SignInActivity extends AppCompatActivity implements View.OnClickLis
     public void onClick(View v) {
         int id = v.getId();
 
-        if(id == R.id.sign_in){
+        if(id == R.id.sign_in_button){
             if(!validateInfo())
                 return;
 
@@ -64,26 +74,38 @@ public class SignInActivity extends AppCompatActivity implements View.OnClickLis
     }
 
     private void signInToFirebase(String email, String password){
-        mAuth.signInWithEmailAndPassword(email,password).addOnSuccessListener(this, new OnSuccessListener<AuthResult>() {
+        mAuth.signInWithEmailAndPassword(email,password).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
             @Override
-            public void onSuccess(AuthResult authResult) {
-                Log.d("Sign_in","Sign in was successful");
-                FirebaseUser user = authResult.getUser();
+            public void onComplete(@NonNull Task<AuthResult> task) {
+                if(task.isSuccessful()){
+                    Log.d("Sign_in","Sign in was successful");
+                    Toast.makeText(SignInActivity.this, "Signed in", Toast.LENGTH_SHORT).show();
+
+                    Intent intent = new Intent(SignInActivity.this,UserMessagingActivity.class);
+//                    intent.putExtra("user",task.getResult().getUser());
+                    startActivity(intent);
+                }
+                else{
+                    Log.d("Sign_in","Sign in Failed!");
+                    Toast.makeText(SignInActivity.this, "" + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+
+                }
             }
         });
+
     }
 
     private boolean validateInfo(){
         Boolean valid = true;
 
         if(TextUtils.isEmpty(email.getText().toString())){
-            valid = false;
             email.setError("Required.");
+            valid = false;
         }
 
         if(TextUtils.isEmpty(password.getText().toString())){
-            valid = false;
             password.setError("Required.");
+            valid = false;
         }
 
         return valid;

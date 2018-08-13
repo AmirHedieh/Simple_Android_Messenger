@@ -81,7 +81,8 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
 
         dialog = new ProgressDialog(SignUpActivity.this);
 
-        fillRandomData();
+//        fillRandomData();
+
 
         showAnimation();
     }
@@ -102,6 +103,7 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
         mEmail.setText(email);
         mPassword.setText(password);
     }
+
     private void showAnimation(){
         photo_selector_button.setAlpha(0f);
         registerButton.setAlpha(0f);
@@ -152,7 +154,7 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
                         }
 
                         // [START_EXCLUDE]
-                        hideProgressDialog();
+
                         // [END_EXCLUDE]
                     }
                 });
@@ -277,8 +279,9 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
     private void registerUserOnFireBaseDataBase(String photoUrl){
         String uid = mAuth.getUid();
         String username = mUsername.getText().toString();
+        String email = mEmail.getText().toString();
 
-        User user = new User(uid,username,photoUrl);
+        User user = new User(uid,username,photoUrl,email);
 
          DatabaseReference mData = FirebaseDatabase.getInstance().getReference("/users/" + uid);
 
@@ -286,6 +289,7 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
              @Override
              public void onSuccess(Void aVoid) {
                  Log.d("Registration","User was added to database");
+                 hideProgressDialog();
              }
          });
     }
