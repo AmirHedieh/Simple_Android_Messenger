@@ -1,6 +1,9 @@
 package com.example.amas.messenger;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.net.Uri;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -10,6 +13,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageView;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -17,18 +21,22 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.squareup.picasso.Picasso;
 import com.xwray.groupie.GroupAdapter;
 import com.xwray.groupie.Item;
 import com.xwray.groupie.ViewHolder;
 
+import de.hdodenhof.circleimageview.CircleImageView;
+
 public class UserMessagingActivity extends AppCompatActivity implements View.OnClickListener {
 
-    private User user;
+    private static User user;
 
     private DatabaseReference firebaseDatabaseRef;
 
     private RecyclerView recyclerView;
 
+    @SuppressLint("HandlerLeak")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -43,21 +51,27 @@ public class UserMessagingActivity extends AppCompatActivity implements View.OnC
             return;
         }
 
-//        initRecyclerView();
-        GroupAdapter adapter = new GroupAdapter();
-
-        recyclerView = findViewById(R.id.recyclerView_messaging_activity);
-
-        adapter.add(new MessageItem());
-        adapter.add(new MessageItem());
-        adapter.add(new MessageItem());
-        adapter.add(new MessageItem());
-
-        recyclerView.setAdapter(adapter);
-
         firebaseDatabaseRef = FirebaseDatabase.getInstance().getReference();
-
+        
         updateUIOnLogin();
+
+        new Handler().postDelayed(new Runnable() { //delay actions till app gets data from server and init user
+            @Override
+            public void run() {
+                GroupAdapter adapter = new GroupAdapter();
+
+                recyclerView = findViewById(R.id.recyclerView_messaging_activity);
+
+                adapter.add(new MessageItem());
+                adapter.add(new MessageItem());
+                adapter.add(new MessageItem());
+                adapter.add(new MessageItem());
+
+                recyclerView.setAdapter(adapter);
+            }
+        },5000);
+
+
     }
 
     private void initRecyclerView(){
@@ -97,6 +111,7 @@ public class UserMessagingActivity extends AppCompatActivity implements View.OnC
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 user =  dataSnapshot.getValue(User.class);
+//                this_user_profile_image_Url = user.profilePhotoUrl;
                 if(user == null) {
                     Log.d("User_Messaging","User was returned as null");
                     return;
@@ -120,11 +135,16 @@ public class UserMessagingActivity extends AppCompatActivity implements View.OnC
     class MessageItem extends Item<ViewHolder> {
         @Override
         public void bind(@NonNull ViewHolder viewHolder, int position) {
-
+//            CircleImageView user_profile_photo = findViewById(R.id.profile_image_messaging_activity);
+            Picasso.get().load(user.profilePhotoUrl).into((CircleImageView) viewHolder.itemView.findViewById(R.id.profile_image_messaging_activity));
+            Log.d("Photo", user.email);
+//            Picasso.get().load();
+//            viewHolder.itemView.
         }
         @Override
         public int getLayout() {
-            return R.layout.chat_message;
+
+            return R.layout.to_chat_message;
         }
     }
 }
