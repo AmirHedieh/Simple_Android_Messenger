@@ -82,13 +82,11 @@ public class SignInActivity extends AppCompatActivity implements View.OnClickLis
                     Toast.makeText(SignInActivity.this, "Signed in", Toast.LENGTH_SHORT).show();
 
                     Intent intent = new Intent(SignInActivity.this,UserMessagingActivity.class);
-//                    intent.putExtra("user",task.getResult().getUser());
                     startActivity(intent);
                 }
                 else{
                     Log.d("Sign_in","Sign in Failed!");
                     Toast.makeText(SignInActivity.this, "" + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
-
                 }
             }
         });

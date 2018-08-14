@@ -25,8 +25,6 @@ public class UserMessagingActivity extends AppCompatActivity implements View.OnC
 
     private DatabaseReference firebaseDatabaseRef;
 
-    private TextView usernameTextView;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -41,10 +39,7 @@ public class UserMessagingActivity extends AppCompatActivity implements View.OnC
             return;
         }
 
-        usernameTextView = findViewById(R.id.username_user_messaging_activity);
-
         firebaseDatabaseRef = FirebaseDatabase.getInstance().getReference();
-
 
         updateUIOnLogin();
     }
@@ -53,6 +48,7 @@ public class UserMessagingActivity extends AppCompatActivity implements View.OnC
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.user_messaging_activity_menu, menu);
+
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -76,6 +72,7 @@ public class UserMessagingActivity extends AppCompatActivity implements View.OnC
 
     private void updateUIOnLogin(){
         DatabaseReference myRef = firebaseDatabaseRef.child("users/" + FirebaseAuth.getInstance().getCurrentUser().getUid());
+
         myRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -84,9 +81,7 @@ public class UserMessagingActivity extends AppCompatActivity implements View.OnC
                     Log.d("User_Messaging","User was returned as null");
                     return;
                 }
-                    usernameTextView.setText(user.username);
                 getSupportActionBar().setTitle(user.username);
-//                Toast.makeText(UserMessagingActivity.this, ""+dataSnapshot.getValue(User.class).email, Toast.LENGTH_SHORT).show();
             }
 
             @Override

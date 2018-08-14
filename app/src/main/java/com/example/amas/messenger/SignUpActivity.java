@@ -85,7 +85,6 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
 
 //        fillRandomData();
 
-
         showAnimation();
     }
 
@@ -121,6 +120,7 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
         mEmail.animate().rotationXBy(90f).setDuration(1000);
         mPassword.animate().rotationXBy(90f).setDuration(1000);
     }
+
     public void createAccount(String email, String password){
         Log.d(TAG, "createAccount:" + email);
         if (!validateForm()) {
@@ -154,10 +154,6 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
                                 }
 //                            updateUI(null);
                         }
-
-                        // [START_EXCLUDE]
-
-                        // [END_EXCLUDE]
                     }
                 });
         // [END create_user_with_email]
