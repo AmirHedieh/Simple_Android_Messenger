@@ -9,4 +9,7 @@
     <string name="ask_account_existence">Doesn\'t have an account?</string>
     <string name="select_photo">Select a Photo</string>
     <string name="sign_out">Sign Out</string>
+    <string name="send">Send</string>
+    <string name="message_hint">Enter your message here</string>
+
 </resources>

@@ -1,7 +1,5 @@
 package com.example.amas.messenger;
 
-import java.io.Serializable;
-
 public class User {
 
     public String uid;
@@ -12,6 +10,7 @@ public class User {
     public User(){
 
     }
+
     public User(String uid, String username, String profileUrl, String email){
         this.uid = uid;
         this.username = username;
