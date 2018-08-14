@@ -36,7 +36,9 @@ public class UserMessagingActivity extends AppCompatActivity implements View.OnC
         if(FirebaseAuth.getInstance().getCurrentUser() == null){
             Intent intent = new Intent(UserMessagingActivity.this, SignInActivity.class);
             startActivity(intent);
+
             this.finish();
+            return;
         }
 
         usernameTextView = findViewById(R.id.username_user_messaging_activity);
@@ -59,6 +61,12 @@ public class UserMessagingActivity extends AppCompatActivity implements View.OnC
         switch (item.getItemId()){
             case R.id.sign_out_user_mesaging_activity: {
                 FirebaseAuth.getInstance().signOut();
+                if(FirebaseAuth.getInstance().getCurrentUser() == null){
+                    Log.d("User_Messaging","User signed out successfully");
+                }
+                else{
+                    Log.d("User_Messaging","User could not sign out");
+                }
                 startActivity(new Intent(UserMessagingActivity.this,SignInActivity.class));
                 this.finish();
             }

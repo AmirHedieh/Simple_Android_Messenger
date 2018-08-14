@@ -43,7 +43,7 @@ public class SignInActivity extends AppCompatActivity implements View.OnClickLis
         email = findViewById(R.id.sign_in_email);
         password = findViewById(R.id.sign_in_password);
 
-        Toast.makeText(this, "-" + mAuth.getCurrentUser().getEmail(), Toast.LENGTH_SHORT).show();
+        getSupportActionBar().setTitle("Sign in");
 
         showAnimation();
     }

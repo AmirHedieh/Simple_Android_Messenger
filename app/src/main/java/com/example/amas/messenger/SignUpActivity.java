@@ -64,6 +64,8 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_up);
 
+        getSupportActionBar().setTitle("Register");
+
         mAuth = FirebaseAuth.getInstance();
 
         mUsername = findViewById(R.id.username);
