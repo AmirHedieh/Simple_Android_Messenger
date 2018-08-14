@@ -8,4 +8,5 @@
     <string name="back_to_sign_in">Back to Sign in </string>
     <string name="ask_account_existence">Doesn\'t have an account?</string>
     <string name="select_photo">Select a Photo</string>
+    <string name="sign_out">Sign Out</string>
 </resources>

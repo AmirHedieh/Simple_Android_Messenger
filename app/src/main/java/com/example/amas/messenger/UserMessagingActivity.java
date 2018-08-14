@@ -1,9 +1,12 @@
 package com.example.amas.messenger;
 
+import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -27,10 +30,23 @@ public class UserMessagingActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_messaging);
 
+        if(FirebaseAuth.getInstance().getCurrentUser() == null){
+            Intent intent = new Intent(UserMessagingActivity.this, SignInActivity.class);
+            startActivity(intent);
+            this.finish();
+        }
+
         usernameTextView = findViewById(R.id.username_user_messaging_activity);
 
         firebaseDatabaseRef = FirebaseDatabase.getInstance().getReference();
         updateUIOnLogin();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.user_messaging_activity_menu, menu);
+        return super.onCreateOptionsMenu(menu);
     }
 
     private void updateUIOnLogin(){
