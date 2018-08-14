@@ -122,7 +122,7 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
     }
 
     public void createAccount(String email, String password){
-        Log.d(TAG, "createAccount:" + email);
+        Log.d("Registration", "createAccount:" + email);
         if (!validateForm()) {
             return;
         }
@@ -130,7 +130,7 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
         showProgressDialog();
 
         // [START create_user_with_email]
-        Log.d("main:",email + password);
+        Log.d("Registration main:",email + password);
         mAuth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
@@ -139,12 +139,12 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
                             // Sign up success, update UI with the signed-in user's information
                             uploadProfilePhotoToFireBaseStorage();
 
-                            Log.d(TAG, "createUserWithEmail:success");
+                            Log.d("Registration", "createUserWithEmail:success");
                             Toast.makeText(SignUpActivity.this, "Account Created Successfully", Toast.LENGTH_SHORT).show();
 //                            updateUI(user);
                         } else {
                             // If sign up fails, display a message to the user.
-                            Log.w(TAG, "createUserWithEmail:failure", task.getException());
+                            Log.w("Registration", "createUserWithEmail:failure", task.getException());
                             Toast.makeText(SignUpActivity.this, "Authentication failed.",
                                     Toast.LENGTH_SHORT).show();
                                 try{
@@ -288,8 +288,17 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
              public void onSuccess(Void aVoid) {
                  Log.d("Registration","User was added to database");
                  hideProgressDialog();
+                 loginToMessenger();
              }
          });
+    }
+
+    private void loginToMessenger(){
+        if(mAuth.getCurrentUser() != null) {
+            Intent intent = new Intent(SignUpActivity.this, UserMessagingActivity.class);
+            startActivity(intent);
+        }
+
     }
 
 
