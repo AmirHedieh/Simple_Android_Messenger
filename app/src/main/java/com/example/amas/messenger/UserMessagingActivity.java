@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -16,12 +17,17 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.xwray.groupie.GroupAdapter;
+import com.xwray.groupie.Item;
+import com.xwray.groupie.ViewHolder;
 
 public class UserMessagingActivity extends AppCompatActivity implements View.OnClickListener {
 
     private User user;
 
     private DatabaseReference firebaseDatabaseRef;
+
+    private RecyclerView recyclerView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,9 +43,25 @@ public class UserMessagingActivity extends AppCompatActivity implements View.OnC
             return;
         }
 
+//        initRecyclerView();
+        GroupAdapter adapter = new GroupAdapter();
+
+        recyclerView = findViewById(R.id.recyclerView_messaging_activity);
+
+        adapter.add(new MessageItem());
+        adapter.add(new MessageItem());
+        adapter.add(new MessageItem());
+        adapter.add(new MessageItem());
+
+        recyclerView.setAdapter(adapter);
+
         firebaseDatabaseRef = FirebaseDatabase.getInstance().getReference();
 
         updateUIOnLogin();
+    }
+
+    private void initRecyclerView(){
+
     }
 
     @Override
@@ -93,5 +115,16 @@ public class UserMessagingActivity extends AppCompatActivity implements View.OnC
     public void onClick(View v) {
         int id = v.getId();
 
+    }
+
+    class MessageItem extends Item<ViewHolder> {
+        @Override
+        public void bind(@NonNull ViewHolder viewHolder, int position) {
+
+        }
+        @Override
+        public int getLayout() {
+            return R.layout.chat_message;
+        }
     }
 }
