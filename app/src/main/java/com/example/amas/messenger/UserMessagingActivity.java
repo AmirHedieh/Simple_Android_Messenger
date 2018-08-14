@@ -7,6 +7,8 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -17,7 +19,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-public class UserMessagingActivity extends AppCompatActivity {
+public class UserMessagingActivity extends AppCompatActivity implements View.OnClickListener {
 
     private User user;
 
@@ -30,6 +32,7 @@ public class UserMessagingActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_messaging);
 
+        getSupportActionBar().setTitle("Connecting...");
         if(FirebaseAuth.getInstance().getCurrentUser() == null){
             Intent intent = new Intent(UserMessagingActivity.this, SignInActivity.class);
             startActivity(intent);
@@ -39,6 +42,8 @@ public class UserMessagingActivity extends AppCompatActivity {
         usernameTextView = findViewById(R.id.username_user_messaging_activity);
 
         firebaseDatabaseRef = FirebaseDatabase.getInstance().getReference();
+
+
         updateUIOnLogin();
     }
 
@@ -49,12 +54,24 @@ public class UserMessagingActivity extends AppCompatActivity {
         return super.onCreateOptionsMenu(menu);
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()){
+            case R.id.sign_out_user_mesaging_activity: {
+                FirebaseAuth.getInstance().signOut();
+                startActivity(new Intent(UserMessagingActivity.this,SignInActivity.class));
+                this.finish();
+            }
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
     private void updateUIOnLogin(){
         DatabaseReference myRef = firebaseDatabaseRef.child("users/" + FirebaseAuth.getInstance().getCurrentUser().getUid());
         myRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                User user =  dataSnapshot.getValue(User.class);
+                user =  dataSnapshot.getValue(User.class);
                 if(user == null) {
                     Log.d("User_Messaging","User was returned as null");
                     return;
@@ -71,4 +88,9 @@ public class UserMessagingActivity extends AppCompatActivity {
         });
     }
 
+    @Override
+    public void onClick(View v) {
+        int id = v.getId();
+
+    }
 }
