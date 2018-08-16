@@ -81,7 +81,7 @@ public class SignInActivity extends AppCompatActivity implements View.OnClickLis
                     Log.d("Sign_in","Sign in was successful");
                     Toast.makeText(SignInActivity.this, "Signed in", Toast.LENGTH_SHORT).show();
 
-                    Intent intent = new Intent(SignInActivity.this,UserMessagingActivity.class);
+                    Intent intent = new Intent(SignInActivity.this,LatestMessagesActivity.class);
                     startActivity(intent);
                 }
                 else{

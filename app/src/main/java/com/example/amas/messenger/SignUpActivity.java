@@ -295,7 +295,7 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
 
     private void loginToMessenger(){
         if(mAuth.getCurrentUser() != null) {
-            Intent intent = new Intent(SignUpActivity.this, UserMessagingActivity.class);
+            Intent intent = new Intent(SignUpActivity.this, LatestMessagesActivity.class);
             startActivity(intent);
         }
 
