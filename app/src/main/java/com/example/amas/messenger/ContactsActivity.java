@@ -1,5 +1,6 @@
 package com.example.amas.messenger;
 
+import android.content.ClipData;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -41,23 +42,21 @@ public class ContactsActivity extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 GroupAdapter adapter = new GroupAdapter();
-
+                User user ;
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                    final User user = snapshot.getValue(User.class);
+                    user = snapshot.getValue(User.class);
 
                     adapter.add(new ContactItem(user));
 
-                    adapter.setOnItemClickListener(new OnItemClickListener() {
-                        @Override
-                        public void onItemClick(@NonNull Item item, @NonNull View view) {
-                            Intent intent = new Intent(ContactsActivity.this,UserMessagingActivity.class);
-                            intent.putExtra("user_serialized",user);
-                            startActivity(intent);
-                        }
-                    });
 
                 }
+                adapter.setOnItemClickListener((item, view) -> {
+                    ContactItem userItem = (ContactItem) item;
+                            Intent intent = new Intent(view.getContext(),UserMessagingActivity.class);
+                            intent.putExtra("user_serialized", userItem.user);
+                            startActivity(intent);
 
+                });
                 recyclerView.setAdapter(adapter);
             }
 
