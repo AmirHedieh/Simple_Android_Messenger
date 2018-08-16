@@ -3,8 +3,14 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
+        android:id="@+id/add_user_messaging_activity"
+        android:title="@string/sign_out"
+        android:icon="@drawable/add_user_icon"
+        app:showAsAction="ifRoom"/>
+    <item
         android:id="@+id/sign_out_user_mesaging_activity"
         android:title="@string/sign_out"
         app:showAsAction="ifRoom"
         android:icon="@drawable/sign_out_button_icon"/>
+
 </menu>

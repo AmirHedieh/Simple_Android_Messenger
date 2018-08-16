@@ -26,17 +26,18 @@ import com.xwray.groupie.GroupAdapter;
 import com.xwray.groupie.Item;
 import com.xwray.groupie.ViewHolder;
 
+import java.util.Iterator;
+
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class UserMessagingActivity extends AppCompatActivity implements View.OnClickListener {
 
-    private static User user;
+    private User user;
 
     private DatabaseReference firebaseDatabaseRef;
 
     private RecyclerView recyclerView;
 
-    @SuppressLint("HandlerLeak")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -55,26 +56,15 @@ public class UserMessagingActivity extends AppCompatActivity implements View.OnC
         
         updateUIOnLogin();
 
-        new Handler().postDelayed(new Runnable() { //delay actions till app gets data from server and init user
-            @Override
-            public void run() {
-                GroupAdapter adapter = new GroupAdapter();
-
-                recyclerView = findViewById(R.id.recyclerView_messaging_activity);
-
-                adapter.add(new MessageItem());
-                adapter.add(new MessageItem());
-                adapter.add(new MessageItem());
-                adapter.add(new MessageItem());
-
-                recyclerView.setAdapter(adapter);
-            }
-        },5000);
 
 
-    }
+//        new Handler().postDelayed(new Runnable() { //delay actions till app gets data from server and init user
+//            @Override
+//            public void run() {
+//
+//            }
+//        },5000);
 
-    private void initRecyclerView(){
 
     }
 
@@ -87,7 +77,7 @@ public class UserMessagingActivity extends AppCompatActivity implements View.OnC
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
+    public boolean onOptionsItemSelected(final MenuItem item) {
         switch (item.getItemId()){
             case R.id.sign_out_user_mesaging_activity: {
                 FirebaseAuth.getInstance().signOut();
@@ -100,6 +90,10 @@ public class UserMessagingActivity extends AppCompatActivity implements View.OnC
                 startActivity(new Intent(UserMessagingActivity.this,SignInActivity.class));
                 this.finish();
             }
+            case R.id.add_user_messaging_activity:{
+                Intent intent = new Intent(UserMessagingActivity.this,ContactsActivity.class);
+                startActivity(intent);
+            }
         }
         return super.onOptionsItemSelected(item);
     }
@@ -111,11 +105,21 @@ public class UserMessagingActivity extends AppCompatActivity implements View.OnC
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 user =  dataSnapshot.getValue(User.class);
-//                this_user_profile_image_Url = user.profilePhotoUrl;
                 if(user == null) {
                     Log.d("User_Messaging","User was returned as null");
                     return;
                 }
+                GroupAdapter adapter = new GroupAdapter();
+
+                recyclerView = findViewById(R.id.recyclerView_messaging_activity);
+
+                adapter.add(new MessageItem());
+                adapter.add(new MessageItem());
+                adapter.add(new MessageItem());
+                adapter.add(new MessageItem());
+
+                recyclerView.setAdapter(adapter);
+
                 getSupportActionBar().setTitle(user.username);
             }
 
@@ -129,21 +133,16 @@ public class UserMessagingActivity extends AppCompatActivity implements View.OnC
     @Override
     public void onClick(View v) {
         int id = v.getId();
-
     }
 
     class MessageItem extends Item<ViewHolder> {
         @Override
         public void bind(@NonNull ViewHolder viewHolder, int position) {
-//            CircleImageView user_profile_photo = findViewById(R.id.profile_image_messaging_activity);
+            if(user != null)
             Picasso.get().load(user.profilePhotoUrl).into((CircleImageView) viewHolder.itemView.findViewById(R.id.profile_image_messaging_activity));
-            Log.d("Photo", user.email);
-//            Picasso.get().load();
-//            viewHolder.itemView.
         }
         @Override
         public int getLayout() {
-
             return R.layout.to_chat_message;
         }
     }
