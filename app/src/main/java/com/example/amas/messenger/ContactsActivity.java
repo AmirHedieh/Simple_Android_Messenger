@@ -5,7 +5,6 @@ import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
@@ -19,8 +18,6 @@ import com.xwray.groupie.GroupAdapter;
 import com.xwray.groupie.Item;
 import com.xwray.groupie.OnItemClickListener;
 import com.xwray.groupie.ViewHolder;
-
-import java.util.Iterator;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -44,9 +41,12 @@ public class ContactsActivity extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 GroupAdapter adapter = new GroupAdapter();
+
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     final User user = snapshot.getValue(User.class);
+
                     adapter.add(new ContactItem(user));
+
                     adapter.setOnItemClickListener(new OnItemClickListener() {
                         @Override
                         public void onItemClick(@NonNull Item item, @NonNull View view) {
@@ -55,7 +55,9 @@ public class ContactsActivity extends AppCompatActivity {
                             startActivity(intent);
                         }
                     });
+
                 }
+
                 recyclerView.setAdapter(adapter);
             }
 
@@ -64,8 +66,6 @@ public class ContactsActivity extends AppCompatActivity {
 
             }
         });
-
-//        recyclerView.setAdapter(adapter);
     }
 
     class ContactItem extends Item<ViewHolder> {

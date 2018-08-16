@@ -34,7 +34,7 @@ public class UserMessagingActivity extends AppCompatActivity implements View.OnC
 
     private User user;
 
-    private DatabaseReference firebaseDatabaseRef;
+    private DatabaseReference dRef;
 
     private RecyclerView recyclerView;
 
@@ -43,93 +43,17 @@ public class UserMessagingActivity extends AppCompatActivity implements View.OnC
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_messaging);
 
-        getSupportActionBar().setTitle("Connecting...");
-        if(FirebaseAuth.getInstance().getCurrentUser() == null){
-            Intent intent = new Intent(UserMessagingActivity.this, SignInActivity.class);
-            startActivity(intent);
-
-            this.finish();
-            return;
-        }
-
-        firebaseDatabaseRef = FirebaseDatabase.getInstance().getReference();
+        dRef = FirebaseDatabase.getInstance().getReference();
         
         updateUIOnLogin();
 
-
-
-//        new Handler().postDelayed(new Runnable() { //delay actions till app gets data from server and init user
-//            @Override
-//            public void run() {
-//
-//            }
-//        },5000);
-
-
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.user_messaging_activity_menu, menu);
 
-        return super.onCreateOptionsMenu(menu);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(final MenuItem item) {
-        switch (item.getItemId()){
-            case R.id.sign_out_user_mesaging_activity: {
-                FirebaseAuth.getInstance().signOut();
-                if(FirebaseAuth.getInstance().getCurrentUser() == null){
-                    Log.d("User_Messaging","User signed out successfully");
-                }
-                else{
-                    Log.d("User_Messaging","User could not sign out");
-                }
-                startActivity(new Intent(UserMessagingActivity.this,SignInActivity.class));
-                this.finish();
-            }
-            case R.id.add_user_messaging_activity:{
-                Intent intent = new Intent(UserMessagingActivity.this,ContactsActivity.class);
-                startActivity(intent);
-            }
-        }
-        return super.onOptionsItemSelected(item);
-    }
 
     private void updateUIOnLogin(){
             user = (User) getIntent().getSerializableExtra("user_serialized");
             getSupportActionBar().setTitle(user.username);
-//        DatabaseReference myRef = firebaseDatabaseRef.child("users/" + FirebaseAuth.getInstance().getCurrentUser().getUid());
-//
-//        myRef.addListenerForSingleValueEvent(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-//                user =  dataSnapshot.getValue(User.class);
-//                if(user == null) {
-//                    Log.d("User_Messaging","User was returned as null");
-//                    return;
-//                }
-//                GroupAdapter adapter = new GroupAdapter();
-//
-//                recyclerView = findViewById(R.id.recyclerView_messaging_activity);
-//
-//                adapter.add(new MessageItem());
-//                adapter.add(new MessageItem());
-//                adapter.add(new MessageItem());
-//                adapter.add(new MessageItem());
-//
-//                recyclerView.setAdapter(adapter);
-//
-//                getSupportActionBar().setTitle(user.username);
-//            }
-//
-//            @Override
-//            public void onCancelled(@NonNull DatabaseError databaseError) {
-//
-//            }
-//        });
     }
 
     @Override
