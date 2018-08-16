@@ -1,5 +1,6 @@
 package com.example.amas.messenger;
 
+import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -16,6 +17,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 import com.xwray.groupie.GroupAdapter;
 import com.xwray.groupie.Item;
+import com.xwray.groupie.OnItemClickListener;
 import com.xwray.groupie.ViewHolder;
 
 import java.util.Iterator;
@@ -24,7 +26,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
 
 public class ContactsActivity extends AppCompatActivity {
 
-    private DatabaseReference dRef = FirebaseDatabase.getInstance().getReference();
+    private DatabaseReference dRef = FirebaseDatabase.getInstance().getReference("users/");
 
     private RecyclerView recyclerView;
 
@@ -42,18 +44,16 @@ public class ContactsActivity extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 GroupAdapter adapter = new GroupAdapter();
-//                dataSnapshot.getChildren().forEach();
-//                Iterator iterator = dataSnapshot.getChildren().iterator();
-//                while (iterator.hasNext()){
-////                    User user = (User) iterator.next();
-////                    adapter.add(new ContactItem(user));
-//                    Log.d("DataChange","entered"  );
-//                    adapter.add(new ContactItem());
-//                }
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-//                    User user = snapshot.getValue(User.class);
-                    Log.d("DataChange","entered"  );
-                    adapter.add(new ContactItem());
+                    User user = snapshot.getValue(User.class);
+                    adapter.add(new ContactItem(user));
+                    adapter.setOnItemClickListener(new OnItemClickListener() {
+                        @Override
+                        public void onItemClick(@NonNull Item item, @NonNull View view) {
+                            Intent intent = new Intent(ContactsActivity.this,UserMessagingActivity.class);
+                            startActivity(intent);
+                        }
+                    });
                 }
                 recyclerView.setAdapter(adapter);
             }
@@ -68,14 +68,15 @@ public class ContactsActivity extends AppCompatActivity {
     }
 
     class ContactItem extends Item<ViewHolder> {
-//        private User user;
-//        public ContactItem(User user){
-//            this.user = user;
-//        }
+        private User user;
+        public ContactItem(User user){
+            this.user = user;
+        }
         @Override
         public void bind(@NonNull ViewHolder viewHolder, int position) {
-//            Picasso.get().load(user.profilePhotoUrl).into((CircleImageView) viewHolder.itemView.findViewById(R.id.contact_profile_image));
-//            (TextView)viewHolder.itemView.findViewById(R.id.contact_username).
+            Picasso.get().load(user.profilePhotoUrl).into((CircleImageView) viewHolder.itemView.findViewById(R.id.contact_profile_image));
+            TextView tv = viewHolder.itemView.findViewById(R.id.contact_username);
+            tv.setText(user.username);
         }
         @Override
         public int getLayout() {
