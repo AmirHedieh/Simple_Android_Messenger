@@ -99,35 +99,37 @@ public class UserMessagingActivity extends AppCompatActivity implements View.OnC
     }
 
     private void updateUIOnLogin(){
-        DatabaseReference myRef = firebaseDatabaseRef.child("users/" + FirebaseAuth.getInstance().getCurrentUser().getUid());
-
-        myRef.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                user =  dataSnapshot.getValue(User.class);
-                if(user == null) {
-                    Log.d("User_Messaging","User was returned as null");
-                    return;
-                }
-                GroupAdapter adapter = new GroupAdapter();
-
-                recyclerView = findViewById(R.id.recyclerView_messaging_activity);
-
-                adapter.add(new MessageItem());
-                adapter.add(new MessageItem());
-                adapter.add(new MessageItem());
-                adapter.add(new MessageItem());
-
-                recyclerView.setAdapter(adapter);
-
-                getSupportActionBar().setTitle(user.username);
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
+            user = (User) getIntent().getSerializableExtra("user_serialized");
+            getSupportActionBar().setTitle(user.username);
+//        DatabaseReference myRef = firebaseDatabaseRef.child("users/" + FirebaseAuth.getInstance().getCurrentUser().getUid());
+//
+//        myRef.addListenerForSingleValueEvent(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+//                user =  dataSnapshot.getValue(User.class);
+//                if(user == null) {
+//                    Log.d("User_Messaging","User was returned as null");
+//                    return;
+//                }
+//                GroupAdapter adapter = new GroupAdapter();
+//
+//                recyclerView = findViewById(R.id.recyclerView_messaging_activity);
+//
+//                adapter.add(new MessageItem());
+//                adapter.add(new MessageItem());
+//                adapter.add(new MessageItem());
+//                adapter.add(new MessageItem());
+//
+//                recyclerView.setAdapter(adapter);
+//
+//                getSupportActionBar().setTitle(user.username);
+//            }
+//
+//            @Override
+//            public void onCancelled(@NonNull DatabaseError databaseError) {
+//
+//            }
+//        });
     }
 
     @Override

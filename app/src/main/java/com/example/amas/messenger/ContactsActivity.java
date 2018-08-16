@@ -45,12 +45,13 @@ public class ContactsActivity extends AppCompatActivity {
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 GroupAdapter adapter = new GroupAdapter();
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                    User user = snapshot.getValue(User.class);
+                    final User user = snapshot.getValue(User.class);
                     adapter.add(new ContactItem(user));
                     adapter.setOnItemClickListener(new OnItemClickListener() {
                         @Override
                         public void onItemClick(@NonNull Item item, @NonNull View view) {
                             Intent intent = new Intent(ContactsActivity.this,UserMessagingActivity.class);
+                            intent.putExtra("user_serialized",user);
                             startActivity(intent);
                         }
                     });
