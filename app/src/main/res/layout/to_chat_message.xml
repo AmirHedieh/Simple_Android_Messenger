@@ -6,7 +6,7 @@
     android:layout_height="wrap_content">
 
     <de.hdodenhof.circleimageview.CircleImageView xmlns:app="http://schemas.android.com/apk/res-auto"
-        android:id="@+id/profile_image_messaging_activity"
+        android:id="@+id/to_message_profile_image"
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:layout_marginEnd="8dp"
@@ -18,7 +18,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/message_text"
+        android:id="@+id/to_message_text"
         android:layout_width="205dp"
         android:layout_height="50dp"
         android:layout_marginEnd="8dp"
@@ -32,8 +32,8 @@
         android:paddingRight="7dp"
         android:paddingTop="4dp"
         android:text="TextView"
-        app:layout_constraintEnd_toStartOf="@+id/profile_image_messaging_activity"
+        app:layout_constraintEnd_toStartOf="@+id/to_message_profile_image"
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/profile_image_messaging_activity" />
+        app:layout_constraintTop_toTopOf="@+id/to_message_profile_image" />
 </android.support.constraint.ConstraintLayout>
