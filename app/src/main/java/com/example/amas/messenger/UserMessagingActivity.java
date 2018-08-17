@@ -1,9 +1,11 @@
 package com.example.amas.messenger;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
@@ -11,6 +13,9 @@ import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.xwray.groupie.GroupAdapter;
@@ -22,6 +27,7 @@ public class UserMessagingActivity extends AppCompatActivity implements View.OnC
     String TAG = "UserMessaging";
 
     private User addressedUser;
+    FirebaseUser user;
 
     private DatabaseReference dRef;
 
@@ -36,27 +42,63 @@ public class UserMessagingActivity extends AppCompatActivity implements View.OnC
         setContentView(R.layout.activity_user_messaging);
 
 
+        addressedUser = (User) getIntent().getSerializableExtra("user_serialized");
+
         recyclerView = findViewById(R.id.recyclerView_messaging_activity);
 
         dRef = FirebaseDatabase.getInstance().getReference();
+        user = FirebaseAuth.getInstance().getCurrentUser();
 
         adapter = new GroupAdapter();
 
         findViewById(R.id.send_button_mesaging_activity).setOnClickListener(this);
         chatBox = findViewById(R.id.message_messaging_activity);
 
+        listenToMessage();
+
         updateUIOnLogin();
+        recyclerView.setAdapter(adapter);
     }
 
-    private void listenToMessage(){
+    private void listenToMessage() {
+//        DatabaseReference dRef = FirebaseDatabase.getInstance().getReference("users/" + user.getUid() + "/Contacts/" + addressedUser.uid).push();
+        DatabaseReference dRef = FirebaseDatabase.getInstance().getReference("users/" + user.getUid() + "/Contacts/" + addressedUser.uid);
+        dRef.addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+                ChatMessageItem chatItem = dataSnapshot.getValue(ChatMessageItem.class);
+                if (chatItem != null) {
+                    Log.d(TAG, "message received");
+                    adapter.add(new MessageToItem(chatItem.text));
+                }
+            }
 
+            @Override
+            public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+            }
+
+            @Override
+            public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
     }
 
     private void sendMessageToFirebaseDatabase(){
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         DatabaseReference senderRef = FirebaseDatabase.getInstance().getReference("users/" + user.getUid() + "/Contacts/" + addressedUser.uid).push();
 
-        String text = chatBox.getText().toString();
+        String text = chatBox.getText().toString(); //text that user typed in chatBox
 
         ChatMessageItem chatMessageItem = new ChatMessageItem(text,addressedUser.uid,user.getUid(),System.currentTimeMillis());
 
@@ -71,7 +113,7 @@ public class UserMessagingActivity extends AppCompatActivity implements View.OnC
     }
 
     private void updateUIOnLogin(){
-            addressedUser = (User) getIntent().getSerializableExtra("user_serialized");
+
             getSupportActionBar().setTitle(addressedUser.username);
     }
 
@@ -100,7 +142,12 @@ public class UserMessagingActivity extends AppCompatActivity implements View.OnC
 
         @Override
         public void bind(@NonNull ViewHolder viewHolder, int position) {
-            TextView tv = viewHolder.itemView.findViewById(R.id.from_message_text);
+            TextView tv = viewHolder.itemView.findViewById(R.id.to_message_text);
+//            TextView tv = (TextView)viewHolder.getItem().getItem(1);
+//            viewHolder.itemView.findViewById(R.id.)
+            if(tv == null){
+                Log.d(TAG,"nulllllllllllllll");
+            }
             tv.setText(messageText);
 //            if(addressedUser != null)
 //            Picasso.get().load(addressedUser.profilePhotoUrl).into((CircleImageView) viewHolder.itemView.findViewById(R.id.from_message_profile_image));
@@ -110,6 +157,7 @@ public class UserMessagingActivity extends AppCompatActivity implements View.OnC
             return R.layout.to_chat_message;
         }
     }
+
     class MessageFromItem extends Item<ViewHolder> {
         private String messageText;
 
