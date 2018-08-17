@@ -9,6 +9,7 @@ import android.view.View;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.squareup.picasso.Picasso;
+import com.xwray.groupie.GroupAdapter;
 import com.xwray.groupie.Item;
 import com.xwray.groupie.ViewHolder;
 
@@ -21,14 +22,19 @@ public class UserMessagingActivity extends AppCompatActivity implements View.OnC
     private DatabaseReference dRef;
 
     private RecyclerView recyclerView;
+    private GroupAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_messaging);
 
+        findViewById(R.id.send_button_mesaging_activity).setOnClickListener(this);
+
+        recyclerView = findViewById(R.id.recyclerView_messaging_activity);
         dRef = FirebaseDatabase.getInstance().getReference();
-        
+        adapter = new GroupAdapter();
+
         updateUIOnLogin();
 
     }
@@ -43,13 +49,21 @@ public class UserMessagingActivity extends AppCompatActivity implements View.OnC
     @Override
     public void onClick(View v) {
         int id = v.getId();
+        switch (id){
+            case R.id.send_button_mesaging_activity:{
+                adapter.add(new MessageToItem());
+                adapter.add(new MessageFromItem());
+                recyclerView.setAdapter(adapter);
+                break;
+            }
+        }
     }
 
     class MessageToItem extends Item<ViewHolder> {
         @Override
         public void bind(@NonNull ViewHolder viewHolder, int position) {
-            if(user != null)
-            Picasso.get().load(user.profilePhotoUrl).into((CircleImageView) viewHolder.itemView.findViewById(R.id.from_message_profile_image));
+//            if(user != null)
+//            Picasso.get().load(user.profilePhotoUrl).into((CircleImageView) viewHolder.itemView.findViewById(R.id.from_message_profile_image));
         }
         @Override
         public int getLayout() {
@@ -59,12 +73,12 @@ public class UserMessagingActivity extends AppCompatActivity implements View.OnC
     class MessageFromItem extends Item<ViewHolder> {
         @Override
         public void bind(@NonNull ViewHolder viewHolder, int position) {
-            if(user != null)
-            Picasso.get().load(user.profilePhotoUrl).into((CircleImageView) viewHolder.itemView.findViewById(R.id.from_message_profile_image));
+//            if(user != null)
+//            Picasso.get().load(user.profilePhotoUrl).into((CircleImageView) viewHolder.itemView.findViewById(R.id.from_message_profile_image));
         }
         @Override
         public int getLayout() {
-            return R.layout.to_chat_message;
+            return R.layout.from_chat_message;
         }
     }
 }
