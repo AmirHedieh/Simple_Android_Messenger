@@ -73,9 +73,9 @@ public class LatestMessagesActivity extends AppCompatActivity {
 
     private void updateUIOnLogin(){
         DatabaseReference firebaseDatabaseRef = FirebaseDatabase.getInstance().getReference();
-        DatabaseReference loggedInUser = firebaseDatabaseRef.child("users/" + FirebaseAuth.getInstance().getCurrentUser().getUid());
+        DatabaseReference loggedInUserRef = firebaseDatabaseRef.child("users/" + FirebaseAuth.getInstance().getCurrentUser().getUid());
 
-        loggedInUser.addListenerForSingleValueEvent(new ValueEventListener() {
+        loggedInUserRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 User user =  dataSnapshot.getValue(User.class);
