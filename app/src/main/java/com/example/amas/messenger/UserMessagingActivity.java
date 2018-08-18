@@ -69,7 +69,12 @@ public class UserMessagingActivity extends AppCompatActivity implements View.OnC
                 ChatMessageItem chatItem = dataSnapshot.getValue(ChatMessageItem.class);
                 if (chatItem != null) {
                     Log.d(TAG, "message received");
+                    if(chatItem.type.equals("SENT")){
                     adapter.add(new MessageToItem(chatItem.text));
+                    }
+                    else if(chatItem.type.equals("RECEIVED")) {
+                        adapter.add(new MessageFromItem(chatItem.text));
+                    }
                 }
             }
 
@@ -100,14 +105,17 @@ public class UserMessagingActivity extends AppCompatActivity implements View.OnC
 
         String text = chatBox.getText().toString(); //text that user typed in chatBox
 
-        ChatMessageItem chatMessageItem = new ChatMessageItem(text,addressedUser.uid,user.getUid(),System.currentTimeMillis());
+        ChatMessageItem chatMessageItemSender = new ChatMessageItem(text,"SENT",System.currentTimeMillis());
 
-        senderRef.setValue(chatMessageItem).addOnSuccessListener(aVoid -> {
+        senderRef.setValue(chatMessageItemSender).addOnSuccessListener(aVoid -> {
             Log.d(TAG,"Saved message successfully for sender");
         });
 
         DatabaseReference receiverRef = FirebaseDatabase.getInstance().getReference("users/" + addressedUser.uid + "/Contacts/" + user.getUid()).push();
-        receiverRef.setValue(chatMessageItem).addOnSuccessListener(aVoid -> {
+
+        ChatMessageItem chatMessageItemReceiver = new ChatMessageItem(text,"RECEIVED",System.currentTimeMillis());
+
+        receiverRef.setValue(chatMessageItemReceiver).addOnSuccessListener(aVoid -> {
             Log.d(TAG,"Saved message successfully for receiver");
         });
     }
